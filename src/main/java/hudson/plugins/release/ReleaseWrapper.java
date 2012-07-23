@@ -28,6 +28,8 @@ import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixProject;
 import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -220,6 +222,9 @@ public class ReleaseWrapper extends BuildWrapper {
 
     @Override
     public Collection<? extends Action> getProjectActions(AbstractProject job) {
+        if (MatrixConfiguration.class.isInstance(job)) {
+            return Collections.emptyList();
+        }
         return Collections.singletonList(new ReleaseAction(job));
     }
     
@@ -381,7 +386,8 @@ public class ReleaseWrapper extends BuildWrapper {
         
         @Override
         public boolean isApplicable(AbstractProject<?, ?> item) {
-            return FreeStyleProject.class.isInstance(item) || MavenModuleSet.class.isInstance(item);
+            return FreeStyleProject.class.isInstance(item) || MavenModuleSet.class.isInstance(item)
+		|| MatrixProject.class.isInstance(item);
         }
     }
 
